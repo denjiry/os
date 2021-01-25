@@ -5,6 +5,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 mod vga_buffer;
+mod serial;
 use core::panic::PanicInfo;
 
 #[no_mangle]
