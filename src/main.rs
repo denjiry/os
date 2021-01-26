@@ -13,14 +13,8 @@ pub extern "C" fn _start() -> ! {
 
     os::init();
 
-    fn stack_overflow() {
-        stack_overflow(); // for each recursion, the return address is pushed
-    }
-
-    // trigger a stack overflow
-    stack_overflow();
-    // // invoke a breakpoint exception
-    // x86_64::instructions::interrupts::int3();
+    // invoke a breakpoint exception
+    x86_64::instructions::interrupts::int3();
 
     #[cfg(test)]
     test_main();
