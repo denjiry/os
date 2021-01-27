@@ -11,13 +11,30 @@ use os::println;
 entry_point!(kernel_main);
 
 pub fn kernel_main(boot_info: &'static BootInfo) -> ! {
-    use os::memory::active_level_4_table;
+    use os::memory::{active_level_4_table, translate_addr};
     use x86_64::VirtAddr;
 
     println!("Hello World{}", "!");
     os::init();
 
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
+    let addresses = [
+        // the identity-mapped vga buffer page
+        0xb8000,
+        // some code page
+        0x201008,
+        // some stack page
+        0x0100_0020_1a10,
+        // virtual address mapped to physical address 0
+        boot_info.physical_memory_offset,
+    ];
+
+    for &address in &addresses {
+        let virt = VirtAddr::new(address);
+        let phys = unsafe { translate_addr(virt, phys_mem_offset) };
+        println!("{:?} -> {:?}", virt, phys);
+    }
+
     let l4_table = unsafe { active_level_4_table(phys_mem_offset) };
 
     for (i, entry) in l4_table.iter().enumerate() {
