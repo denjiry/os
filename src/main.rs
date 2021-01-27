@@ -13,6 +13,11 @@ pub extern "C" fn _start() -> ! {
 
     os::init();
 
+    let ptr = 0xdeadbeaf as *mut u32;
+    unsafe {
+        *ptr = 42;
+    }
+
     #[cfg(test)]
     test_main();
 
