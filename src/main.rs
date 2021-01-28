@@ -22,7 +22,7 @@ pub fn kernel_main(boot_info: &'static BootInfo) -> ! {
     let mut frame_allocator = memory::EmptyFrameAllocator;
 
     // map an unused page
-    let page = Page::containing_address(VirtAddr::new(0xdeadbeaf000));
+    let page = Page::containing_address(VirtAddr::new(0));
     memory::create_example_mapping(page, &mut mapper, &mut frame_allocator);
 
     // write the string `New!` to the screen through the new mapping
