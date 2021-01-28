@@ -2,6 +2,11 @@ use alloc::alloc::{GlobalAlloc, Layout};
 use core::ptr::null_mut;
 
 pub struct Dummy;
+#[global_allocator]
+static ALLOCATOR: Dummy = Dummy;
+
+pub const HEAP_START: usize = 0x_4444_4444_0000;
+pub const HEAP_SIZE: usize = 100 * 1024; // 100 KiB
 
 unsafe impl GlobalAlloc for Dummy {
     unsafe fn alloc(&self, _layout: Layout) -> *mut u8 {
