@@ -100,3 +100,11 @@ fn translate_addr_inner(addr: VirtAddr, physical_memory_offset: VirtAddr) -> Opt
     // calculate the physical address by adding the page offset
     Some(frame.start_address() + u64::from(addr.page_offset()))
 }
+
+pub struct EmptyFrameAllocator;
+
+unsafe impl FrameAllocator<Size4KiB> for EmptyFrameAllocator {
+    fn allocate_frame(&mut self) -> Option<PhysFrame> {
+        None
+    }
+}
