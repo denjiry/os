@@ -7,9 +7,12 @@
 
 pub mod gdt;
 pub mod interrupts;
+pub mod memory;
 pub mod serial;
 pub mod vga_buffer;
-pub mod memory;
+pub mod allocator;
+
+extern crate alloc;
 use core::panic::PanicInfo;
 
 pub fn init() {
