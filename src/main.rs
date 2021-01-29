@@ -17,7 +17,7 @@ pub fn kernel_main(boot_info: &'static BootInfo) -> ! {
     use os::allocator;
     use os::memory;
     use os::memory::BootInfoFrameAllocator;
-    use x86_64::{structures::paging::Page, VirtAddr};
+    use x86_64::VirtAddr;
 
     println!("Hello World{}", "!");
     os::init();
