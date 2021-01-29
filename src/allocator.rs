@@ -1,3 +1,5 @@
+pub mod bump;
+
 use alloc::alloc::{GlobalAlloc, Layout};
 use linked_list_allocator::LockedHeap;
 use x86_64::{
