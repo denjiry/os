@@ -141,4 +141,5 @@ impl LinkedListAllocator {
             .pad_to_align();
         let size = layout.size().max(mem::size_of::<ListNode>());
         (size, layout.align())
-   
+    }
+}
