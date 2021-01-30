@@ -9,7 +9,8 @@ extern crate alloc;
 use bootloader::{entry_point, BootInfo};
 use core::panic::PanicInfo;
 use os::println;
-use os::task::{keyboard,Task, simple_executor::SimpleExecutor};
+use os::task::{keyboard, Task };
+use os::task::executor::Executor;
 
 entry_point!(kernel_main);
 
@@ -28,16 +29,13 @@ pub fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     allocator::init_heap(&mut mapper, &mut frame_allocator).expect("heap initialization failed");
 
-    let mut executor = SimpleExecutor::new();
-    executor.spawn(Task::new(example_task()));
-    executor.spawn(Task::new(keyboard::print_keypresses()));
-    executor.run();
-
     #[cfg(test)]
     test_main();
 
-    println!("It did not crash!");
-    os::hlt_loop();
+    let mut executor = Executor::new();
+    executor.spawn(Task::new(example_task()));
+    executor.spawn(Task::new(keyboard::print_keypresses()));
+    executor.run();
 }
 
 #[cfg(not(test))]
