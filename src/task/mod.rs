@@ -1,6 +1,7 @@
 pub mod simple_executor;
 
 use alloc::boxed::Box;
+use core::task::{Context, Poll};
 use core::{future::Future, pin::Pin};
 
 pub struct Task {
@@ -12,5 +13,8 @@ impl Task {
         Task {
             future: Box::pin(future),
         }
+    }
+    fn poll(&mut self, context: &mut Context) -> Poll<()> {
+        self.future.as_mut().poll(context)
     }
 }
