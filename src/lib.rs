@@ -9,6 +9,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 pub mod allocator;
+pub mod task;
 pub mod gdt;
 pub mod interrupts;
 pub mod memory;
