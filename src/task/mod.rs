@@ -1,4 +1,5 @@
 pub mod simple_executor;
+pub mod keyboard;
 
 use alloc::boxed::Box;
 use core::task::{Context, Poll};
