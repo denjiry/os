@@ -64,3 +64,8 @@ async fn example_task() {
     let number = async_number().await;
     println!("async number: {}", number);
 }
+
+extern "C" fn example_app() -> !{
+    println!("hello");
+    os::hlt_loop();
+}
