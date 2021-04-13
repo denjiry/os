@@ -1,6 +1,6 @@
-pub mod simple_executor;
-pub mod keyboard;
 pub mod executor;
+pub mod keyboard;
+pub mod simple_executor;
 
 use alloc::boxed::Box;
 use core::task::{Context, Poll};
@@ -19,7 +19,7 @@ impl TaskId {
 }
 
 pub struct Task {
-    id:TaskId,
+    id: TaskId,
     future: Pin<Box<dyn Future<Output = ()>>>,
 }
 
