@@ -1,11 +1,53 @@
 use super::{Task, TaskId};
 use alloc::{collections::BTreeMap, sync::Arc};
 use core::task::{Context, Poll, Waker};
-use crossbeam_queue::ArrayQueue;
+use crossbeam_queue::{ArrayQueue, PopError, PushError};
+
+struct TaskQueue {
+    async_task: ArrayQueue<TaskId>,
+    timer_task: ArrayQueue<TaskId>,
+}
+
+enum TaskPriority {
+    High,
+    Low,
+}
+
+impl TaskQueue {
+    fn new(array_length: usize) -> Self {
+        TaskQueue {
+            async_task: ArrayQueue::new(array_length),
+            timer_task: ArrayQueue::new(array_length),
+        }
+    }
+
+    fn push(&self, task_id: TaskId, priority: TaskPriority) -> Result<(), PushError<TaskId>> {
+        match priority {
+            TaskPriority::High => {
+                self.async_task.push(task_id)?;
+            }
+            TaskPriority::Low => {
+                self.timer_task.push(task_id)?;
+            }
+        }
+        Ok(())
+    }
+
+    fn pop(&self) -> Result<TaskId, PopError> {
+        if let Ok(async_task_id) = self.async_task.pop() {
+            return Ok(async_task_id);
+        }
+        self.timer_task.pop()
+    }
+
+    fn is_empty(&self) -> bool {
+        self.async_task.is_empty() && self.timer_task.is_empty()
+    }
+}
 
 pub struct Executor {
     tasks: BTreeMap<TaskId, Task>,
-    task_queue: Arc<ArrayQueue<TaskId>>,
+    task_queue: Arc<TaskQueue>,
     waker_cache: BTreeMap<TaskId, Waker>,
 }
 
@@ -13,7 +55,7 @@ impl Executor {
     pub fn new() -> Self {
         Executor {
             tasks: BTreeMap::new(),
-            task_queue: Arc::new(ArrayQueue::new(100)),
+            task_queue: Arc::new(TaskQueue::new(100)),
             waker_cache: BTreeMap::new(),
         }
     }
@@ -23,7 +65,9 @@ impl Executor {
         if self.tasks.insert(task.id, task).is_some() {
             panic!("task with same ID already in tasks");
         }
-        self.task_queue.push(task_id).expect("queue full");
+        self.task_queue
+            .push(task_id, TaskPriority::High)
+            .expect("queue full");
     }
 
     fn run_ready_tasks(&mut self) {
@@ -75,11 +119,11 @@ impl Executor {
 
 struct TaskWaker {
     task_id: TaskId,
-    task_queue: Arc<ArrayQueue<TaskId>>,
+    task_queue: Arc<TaskQueue>,
 }
 
 impl TaskWaker {
-    fn new(task_id: TaskId, task_queue: Arc<ArrayQueue<TaskId>>) -> Waker {
+    fn new(task_id: TaskId, task_queue: Arc<TaskQueue>) -> Waker {
         Waker::from(Arc::new(TaskWaker {
             task_id,
             task_queue,
@@ -87,7 +131,9 @@ impl TaskWaker {
     }
 
     fn wake_task(&self) {
-        self.task_queue.push(self.task_id).expect("task_queue full");
+        self.task_queue
+            .push(self.task_id, TaskPriority::High)
+            .expect("task_queue full");
     }
 }
 
