@@ -45,7 +45,7 @@ lazy_static! {
 }
 
 extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: &mut InterruptStackFrame) {
-    print!(".");
+    // print!(".");
 
     unsafe {
         PICS.lock()

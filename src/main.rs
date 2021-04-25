@@ -9,8 +9,8 @@ extern crate alloc;
 use bootloader::{entry_point, BootInfo};
 use core::panic::PanicInfo;
 use os::println;
-use os::task::{keyboard, Task };
 use os::task::executor::Executor;
+use os::task::{keyboard, Task};
 
 entry_point!(kernel_main);
 
@@ -65,7 +65,7 @@ async fn example_task() {
     println!("async number: {}", number);
 }
 
-extern "C" fn example_app() -> !{
+extern "C" fn example_app() -> ! {
     println!("hello");
     os::hlt_loop();
 }
