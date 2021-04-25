@@ -8,7 +8,7 @@ struct TaskQueue {
     timer_task: ArrayQueue<TaskId>,
 }
 
-enum TaskPriority {
+pub enum TaskPriority {
     High,
     Low,
 }
@@ -60,14 +60,12 @@ impl Executor {
         }
     }
 
-    pub fn spawn(&mut self, task: Task) {
+    pub fn spawn(&mut self, task: Task, priority: TaskPriority) {
         let task_id = task.id;
         if self.tasks.insert(task.id, task).is_some() {
             panic!("task with same ID already in tasks");
         }
-        self.task_queue
-            .push(task_id, TaskPriority::High)
-            .expect("queue full");
+        self.task_queue.push(task_id, priority).expect("queue full");
     }
 
     fn run_ready_tasks(&mut self) {
